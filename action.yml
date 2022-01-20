@@ -1,0 +1,31 @@
+name: pc-action-hu
+description: this action packages and sends student repository to plagiaatcontrole application
+author: INNO 255
+branding:
+  icon: arrow-down-circle
+  color: blue
+
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
+
+
+
+    - run: pip install requests-toolbelt
+      shell: bash
+      # [-r] -r <requirements file>, [-e] <local project path>
+      # https://medium.com/ai2-blog/python-caching-in-github-actions-e9452698e98d
+
+    - run: python ${{ github.action_path }}/sendzip.py
+      shell: bash
+
+    - run: ls ${{ github.workspace }}
+      shell: bash
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: please
+        path: ${{ github.workspace }}/studentdata.tar
