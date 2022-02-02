@@ -6,7 +6,8 @@ import tarfile
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
-url = "http://20.101.212.4:80/project/file/"
+
+url = os.environ.get('ACTIONS_BACKEND_URL')
 
 contribs = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')) + '/contributors')
 repoinfo = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')))

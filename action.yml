@@ -24,8 +24,3 @@ runs:
 
     - run: ls ${{ github.workspace }}
       shell: bash
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: please
-        path: ${{ github.workspace }}/studentdata.tar
