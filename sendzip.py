@@ -26,7 +26,7 @@ contribjson = contribs.json()
 jwtoidcjson = json.loads(jwtoidc.content)
 
 data = {
-    'repositoryUrl': 'kip.git',
+    'repositoryUrl': os.environ.get('PG_REPO_URL'),
     'repositoryId': int(repoinfojson['id']),
     'assignmentId': os.environ.get('PG_ASSIGNMENT_ID'),  # github action input
     'repositoryName': os.environ.get('GITHUB_REPOSITORY'),
