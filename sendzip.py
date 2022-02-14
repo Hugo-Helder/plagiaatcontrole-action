@@ -5,9 +5,7 @@ import tarfile
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-
-
-url = 'plagiaatcontrole.westeurope.cloudapp.azure.com'
+url = 'http://plagiaatcontrole.westeurope.cloudapp.azure.com/project/file'
 
 contribs = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')) + '/contributors')
 repoinfo = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')))
