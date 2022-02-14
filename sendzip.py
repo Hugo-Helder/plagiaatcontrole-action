@@ -7,7 +7,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
 
-url = os.environ.get('ACTIONS_BACKEND_URL')
+url = 'plagiaatcontrole.westeurope.cloudapp.azure.com'
 
 contribs = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')) + '/contributors')
 repoinfo = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')))
