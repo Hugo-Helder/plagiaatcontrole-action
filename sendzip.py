@@ -7,17 +7,30 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 url = 'http://plagiaatcontrole.westeurope.cloudapp.azure.com/project/file/'
 
-contribs = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')) + '/contributors')
-repoinfo = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')))
+try:
+    contribs = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')) + '/contributors')
+except:
+    print("Could not fetch contributors from the repository")
+    exit(1)
 
-jwtoidc = requests.get(
-    os.environ.get('ACTIONS_ID_TOKEN_REQUEST_URL') + '&audience=o6s',
-    headers={
-        "User-Agent": "actions/oidc-client",
-        "Authorization": "Bearer " + os.environ.get('ACTIONS_ID_TOKEN_REQUEST_TOKEN'),
-        'Accept': 'application/json'
-    }
-)
+try:
+    repoinfo = requests.get('https://api.github.com/repos/' + str(os.environ.get('GITHUB_REPOSITORY')))
+except:
+    print("Could not fetch repository details")
+    exit(1)
+
+try:
+    jwtoidc = requests.get(
+        os.environ.get('ACTIONS_ID_TOKEN_REQUEST_URL') + '&audience=o6s',
+        headers={
+            "User-Agent": "actions/oidc-client",
+            "Authorization": "Bearer " + os.environ.get('ACTIONS_ID_TOKEN_REQUEST_TOKEN'),
+            'Accept': 'application/json'
+        }
+    )
+except:
+    print("Could not fetch JWT/OIDC")
+    exit(1)
 
 repoinfojson = repoinfo.json()
 contribjson = contribs.json()
@@ -32,14 +45,17 @@ data = {
     'jwtoidc': []
 }
 
-for student in contribjson:
-    print(student['login'])
-    print(student['id'])
+try:
+    for student in contribjson:
+        print(student['login'])
+        print(student['id'])
 
-    data['students'].append({
-        'studentId': student['id'],
-        'studentUsername': student['login']
-    })
+        data['students'].append({
+            'studentId': student['id'],
+            'studentUsername': student['login']
+        })
+except:
+    print("Error while parsing student details")
 
 data['jwtoidc'].append(jwtoidcjson)
 json_data = json.dumps(data)
@@ -51,11 +67,13 @@ def reset(tarinfo):
     tarinfo.mode = tarinfo.mode = int('0777', base=8)
     return tarinfo
 
-
-tar = tarfile.open(os.environ['GITHUB_WORKSPACE'] + "/studentdata.tar", "w:tar")
-tar.add(os.environ['GITHUB_WORKSPACE'], filter=reset, recursive=True, arcname="")
-tar.close()
-
+try:
+    tar = tarfile.open(os.environ['GITHUB_WORKSPACE'] + "/studentdata.tar", "w:tar")
+    tar.add(os.environ['GITHUB_WORKSPACE'], filter=reset, recursive=True, arcname="")
+    tar.close()
+except:
+    print("Error while compressing repository into .tar")
+    exit(1)
 print(json_data)
 
 
@@ -67,11 +85,15 @@ multipart_encoder = MultipartEncoder(
     }
 )
 
-requests.post(
-    url,
-    data=multipart_encoder,
-    # The MultipartEncoder provides the content-type header with the boundary:
-    headers={'Content-Type': multipart_encoder.content_type}
-)
-
+try:
+    requests.post(
+        url,
+        data=multipart_encoder,
+        # The MultipartEncoder provides the content-type header with the boundary:
+        headers={'Content-Type': multipart_encoder.content_type}
+    )
+except ConnectionRefusedError:
+    print("Failed to establish connection: Connection refused")
+except:
+    print("Could not send post request")
 print(multipart_encoder.to_string())
