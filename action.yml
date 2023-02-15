@@ -12,7 +12,7 @@ on:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: zip -r repository.zip *
       shell: bash
     - run: curl -X POST $(git shortlog --summary --numbered --email | grep '@student.hu.nl' | sed -r 's/^.*<(.*@student\.hu\.nl)>$/\1/' | sed 's/^/-F huMails=/' | tr '\n' ' ') -F codeSource=${{github.repositoryUrl}} -F file=@repository.zip https://13.81.86.45/assignments/$(echo ${{github.event.repository.name}} | sed -r 's/^([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}).*/\1/')/submissions
