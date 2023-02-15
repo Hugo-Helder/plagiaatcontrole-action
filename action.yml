@@ -1,26 +1,19 @@
-name: pc-action-hu
+name: PlagiaatControle
 description: this action packages and sends student repository to plagiaatcontrole application
 author: INNO 255
 branding:
   icon: arrow-down-circle
   color: blue
 
+on:
+  create:
+    ref_type: "tag"
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v2
-
-
-
-
-    - run: pip install requests-toolbelt
+    - run: zip -r repository.zip *
       shell: bash
-      # [-r] -r <requirements file>, [-e] <local project path>
-      # https://medium.com/ai2-blog/python-caching-in-github-actions-e9452698e98d
-
-    - run: python ${{ github.action_path }}/sendzip.py
-      shell: bash
-
-    - run: ls ${{ github.workspace }}
+    - run: curl -X POST $(git shortlog --summary --numbered --email | grep '@student.hu.nl' | sed -r 's/^.*<(.*@student\.hu\.nl)>$/\1/' | sed 's/^/-F huMails=/' | tr '\n' ' ') -F codeSource=${{github.repositoryUrl}} -F file=@repository.zip https://13.81.86.45/assignments/$(echo ${{github.event.repository.name}} | sed -r 's/^([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}).*/\1/')/submissions
       shell: bash
